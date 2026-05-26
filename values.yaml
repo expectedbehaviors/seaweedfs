@@ -1,0 +1,72 @@
+# Baseline SeaweedFS platform values.
+# Defaults are generic and sanitized: no real hostnames, node names, or disk paths
+# specific to a private environment. Override values.yaml in your instantiation.
+
+seaweedfs-operator:
+  replicaCount: 1
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      memory: 512Mi
+
+csi:
+  seaweedfsFiler: "seaweedfs-filer-media.seaweedfs.svc.cluster.local:8888"
+  node:
+    injectTopologyInfoFromNodeLabel:
+      enabled: true
+      labels:
+        dataCenter: seaweedfs/topology.datacenter
+        rack: seaweedfs/topology.rack
+
+storageClasses:
+  - name: seaweedfs-media
+    default: false
+    # Two total copies: primary + one replica in a different rack/topology domain.
+    replication: "010"
+    reclaimPolicy: Retain
+    allowVolumeExpansion: true
+    volumeBindingMode: Immediate
+    mountOptions:
+      - noatime
+      - nodiratime
+
+seaweeds:
+  - name: media
+    namespace: seaweedfs
+    master:
+      replicas: 3
+      volumeSizeLimitMB: 30000
+      nodeSelector: {}
+    filer:
+      replicas: 3
+      nodeSelector: {}
+    volumeServer:
+      nodeSelector: {}
+      disks:
+        - path: /var/mnt/seaweed/disks/hdd-01
+          maxVolumes: 0
+        - path: /var/mnt/seaweed/disks/hdd-02
+          maxVolumes: 0
+    topology:
+      datacenter: default
+      rackLabel: seaweedfs/topology.rack
+
+persistentVolumeClaims: []
+# Example:
+# - enabled: true
+#   name: media-data
+#   namespace: media
+#   storageClass: seaweedfs-media
+#   accessModes:
+#     - ReadWriteMany
+#   size: 1Ti
+#   volumeMode: Filesystem
+#   annotations: {}
+#   labels: {}
+
+onepassworditem:
+  enabled: false
+  defaultVault: Kubernetes
+  items: []

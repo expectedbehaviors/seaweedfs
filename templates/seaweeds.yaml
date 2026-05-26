@@ -1,0 +1,41 @@
+{{- range .Values.seaweeds }}
+---
+apiVersion: seaweed.seaweedfs.com/v1
+kind: Seaweed
+metadata:
+  name: {{ .name }}
+  namespace: {{ default "seaweedfs" .namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  {{- if .master }}
+  master:
+    replicas: {{ .master.replicas }}
+    {{- with .master.volumeSizeLimitMB }}
+    volumeSizeLimitMB: {{ . }}
+    {{- end }}
+    {{- with .master.nodeSelector }}
+    nodeSelector:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+  {{- end }}
+  {{- if .filer }}
+  filer:
+    replicas: {{ .filer.replicas }}
+    {{- with .filer.nodeSelector }}
+    nodeSelector:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+  {{- end }}
+  {{- if .volumeServer }}
+  volumeServer:
+    {{- with .volumeServer.nodeSelector }}
+    nodeSelector:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+    {{- with .volumeServer.disks }}
+    disks:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+  {{- end }}
+{{- end }}
