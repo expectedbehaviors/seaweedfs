@@ -57,7 +57,7 @@ seaweeds:
 persistentVolumeClaims: []
 # Example:
 # - enabled: true
-#   name: media-data
+#   name: media
 #   namespaces:
 #     - media
 #   storageClass: seaweedfs-media
@@ -73,7 +73,7 @@ persistentVolumeClaims: []
 #   static:
 #     enabled: false
 #     # Defaults to the PVC name when omitted.
-#     volumeHandle: media-data
+#     volumeHandle: media
 #     collection: media
 #     replication: "010"
 #     path: /media
