@@ -23,6 +23,7 @@ csi:
 storageClasses:
   - name: seaweedfs-media
     default: false
+    provisioner: seaweedfs-csi-driver
     # Two total copies: primary + one replica in a different rack/topology domain.
     replication: "010"
     reclaimPolicy: Retain
@@ -57,7 +58,8 @@ persistentVolumeClaims: []
 # Example:
 # - enabled: true
 #   name: media-data
-#   namespace: media
+#   namespaces:
+#     - media
 #   storageClass: seaweedfs-media
 #   accessModes:
 #     - ReadWriteMany
@@ -65,6 +67,19 @@ persistentVolumeClaims: []
 #   volumeMode: Filesystem
 #   annotations: {}
 #   labels: {}
+#   # Optional static mode for sharing one SeaweedFS path across namespaces.
+#   # When enabled, the chart renders one PV/PVC binding per namespace using the
+#   # same CSI volumeHandle/path instead of dynamically provisioning separate volumes.
+#   static:
+#     enabled: false
+#     # Defaults to the PVC name when omitted.
+#     volumeHandle: media-data
+#     collection: media
+#     replication: "010"
+#     path: /media
+#     diskType: hdd
+#     readOnly: false
+#     reclaimPolicy: Retain
 
 onepassworditem:
   enabled: false

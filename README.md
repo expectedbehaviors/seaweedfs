@@ -16,19 +16,23 @@ Baseline Helm chart for [SeaweedFS](https://github.com/seaweedfs/seaweedfs) dist
 | Operator | `seaweedfs-operator.*` | One operator replica |
 | CSI filer endpoint | `csi.seaweedfsFiler` | `seaweedfs-filer-media.seaweedfs.svc.cluster.local:8888` |
 | CSI topology labels | `csi.node.injectTopologyInfoFromNodeLabel.labels` | `dataCenter` and `rack` labels |
-| StorageClass | `storageClasses[]` | `seaweedfs-media`, expandable, `replication: "010"` |
+| StorageClass | `storageClasses[]` | `seaweedfs-media`, expandable, `provisioner: seaweedfs-csi-driver`, `replication: "010"` |
 | Seaweed clusters | `seaweeds[]` | One example `media` cluster |
 | Pre-provisioned PVCs | `persistentVolumeClaims[]` | `[]` |
 
 ## Pre-provisioned PVCs
 
-Use `persistentVolumeClaims[]` when you want the chart to create one or more shared claims alongside SeaweedFS:
+Use `persistentVolumeClaims[]` when you want the chart to create one or more claims alongside SeaweedFS. A claim can target a single `namespace` or a Longhorn-style `namespaces[]` list.
+
+Dynamic PVC mode provisions one SeaweedFS CSI volume per namespace:
 
 ```yaml
 persistentVolumeClaims:
   - enabled: true
     name: media-data
-    namespace: media
+    namespaces:
+      - media
+      - plex
     storageClass: seaweedfs-media
     accessModes:
       - ReadWriteMany
@@ -36,6 +40,27 @@ persistentVolumeClaims:
     volumeMode: Filesystem
     annotations: {}
     labels: {}
+```
+
+Static PV/PVC mode binds the same SeaweedFS CSI `volumeHandle` + `path` into multiple namespaces. The `volumeHandle` defaults to the PVC name, so this mirrors the Longhorn pattern: unique PV object names per namespace, one stable backing volume handle underneath. Use this when several apps must see the same RWX filesystem tree:
+
+```yaml
+persistentVolumeClaims:
+  - enabled: true
+    name: media-data
+    namespaces: [media, plex, radarr, sonarr]
+    accessModes: [ReadWriteMany]
+    size: 32Ti
+    volumeMode: Filesystem
+    static:
+      enabled: true
+      volumeHandle: media-data
+      collection: media
+      replication: "010"
+      path: /media
+      diskType: hdd
+      readOnly: false
+      reclaimPolicy: Retain
 ```
 
 ## Install

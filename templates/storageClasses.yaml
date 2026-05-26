@@ -9,7 +9,7 @@ metadata:
     {{- if .default }}
     storageclass.kubernetes.io/is-default-class: "true"
     {{- end }}
-provisioner: seaweedfs.csi.seaweedfs.com
+provisioner: {{ default "seaweedfs-csi-driver" .provisioner }}
 reclaimPolicy: {{ default "Retain" .reclaimPolicy }}
 allowVolumeExpansion: {{ default true .allowVolumeExpansion }}
 volumeBindingMode: {{ default "Immediate" .volumeBindingMode }}

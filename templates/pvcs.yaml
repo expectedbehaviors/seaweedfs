@@ -1,0 +1,99 @@
+{{- range .Values.persistentVolumeClaims }}
+{{- if .enabled }}
+{{- $claim := . }}
+{{- $namespaces := default (list (default $.Release.Namespace .namespace)) .namespaces }}
+{{- range $namespace := $namespaces }}
+{{- $accessModes := default (list "ReadWriteMany") $claim.accessModes }}
+{{- $volumeMode := default "Filesystem" $claim.volumeMode }}
+{{- if and $claim.static $claim.static.enabled }}
+{{- $pvName := default (printf "%s-%s" $namespace $claim.name) $claim.pvName }}
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ $pvName }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "4"
+    {{- with $claim.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- with $claim.labels }}
+  labels:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  accessModes:
+    {{- toYaml $accessModes | nindent 4 }}
+  capacity:
+    storage: {{ $claim.size }}
+  csi:
+    driver: {{ default "seaweedfs-csi-driver" $claim.static.driver | quote }}
+    volumeHandle: {{ default $claim.name $claim.static.volumeHandle | quote }}
+    {{- with $claim.static.volumeAttributes }}
+    volumeAttributes:
+      {{- toYaml . | nindent 6 }}
+    {{- else }}
+    volumeAttributes:
+      collection: {{ default "default" $claim.static.collection | quote }}
+      replication: {{ default "001" $claim.static.replication | quote }}
+      path: {{ required "persistentVolumeClaims[].static.path is required when static.enabled=true" $claim.static.path | quote }}
+      {{- with $claim.static.diskType }}
+      diskType: {{ . | quote }}
+      {{- end }}
+    {{- end }}
+    readOnly: {{ default false $claim.static.readOnly }}
+  persistentVolumeReclaimPolicy: {{ default "Retain" $claim.static.reclaimPolicy }}
+  storageClassName: {{ default "" $claim.static.storageClassName | quote }}
+  volumeMode: {{ $volumeMode }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ $claim.name }}
+  namespace: {{ $namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "4"
+    {{- with $claim.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- with $claim.labels }}
+  labels:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  accessModes:
+    {{- toYaml $accessModes | nindent 4 }}
+  resources:
+    requests:
+      storage: {{ $claim.size }}
+  storageClassName: {{ default "" $claim.static.storageClassName | quote }}
+  volumeMode: {{ $volumeMode }}
+  volumeName: {{ $pvName }}
+{{- else }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ $claim.name }}
+  namespace: {{ $namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "4"
+    {{- with $claim.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- with $claim.labels }}
+  labels:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  accessModes:
+    {{- toYaml $accessModes | nindent 4 }}
+  storageClassName: {{ $claim.storageClass }}
+  volumeMode: {{ $volumeMode }}
+  resources:
+    requests:
+      storage: {{ $claim.size }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
