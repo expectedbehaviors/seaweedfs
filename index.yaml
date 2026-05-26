@@ -1,0 +1,37 @@
+apiVersion: v1
+entries:
+  seaweedfs:
+  - apiVersion: v2
+    appVersion: 1.0.0
+    created: "2026-05-26T03:04:37.225779586Z"
+    dependencies:
+    - name: seaweedfs-operator
+      repository: https://seaweedfs.github.io/seaweedfs-operator/
+      version: 0.1.23
+    - alias: csi
+      name: seaweedfs-csi-driver
+      repository: https://seaweedfs.github.io/seaweedfs-csi-driver/helm
+      version: 0.2.21
+    - name: onepassworditem
+      repository: https://expectedbehaviors.github.io/OnePasswordItem-helm
+      version: 1.1.1
+    description: SeaweedFS operator, CSI driver, StorageClasses, Seaweed CRs, and
+      optional media PVC baseline.
+    digest: 0398f6134242f13dad84bc138e58cb483a064a03322fd783c137a5c5f4f1ad73
+    home: https://github.com/seaweedfs/seaweedfs
+    keywords:
+    - seaweedfs
+    - csi
+    - storage
+    - rwx
+    kubeVersion: '>=1.22.0-0'
+    name: seaweedfs
+    sources:
+    - https://github.com/seaweedfs/seaweedfs
+    - https://github.com/seaweedfs/seaweedfs-operator
+    - https://github.com/seaweedfs/seaweedfs-csi-driver
+    type: application
+    urls:
+    - https://expectedbehaviors.github.io/seaweedfs/seaweedfs-1.0.0.tgz
+    version: 1.0.0
+generated: "2026-05-26T03:04:37.221772699Z"
