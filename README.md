@@ -29,7 +29,7 @@ Dynamic PVC mode provisions one SeaweedFS CSI volume per namespace:
 ```yaml
 persistentVolumeClaims:
   - enabled: true
-    name: media-data
+    name: media
     namespaces:
       - media
       - plex
@@ -47,14 +47,14 @@ Static PV/PVC mode binds the same SeaweedFS CSI `volumeHandle` + `path` into mul
 ```yaml
 persistentVolumeClaims:
   - enabled: true
-    name: media-data
+    name: media
     namespaces: [media, plex, radarr, sonarr]
     accessModes: [ReadWriteMany]
     size: 32Ti
     volumeMode: Filesystem
     static:
       enabled: true
-      volumeHandle: media-data
+      volumeHandle: media
       collection: media
       replication: "010"
       path: /media
