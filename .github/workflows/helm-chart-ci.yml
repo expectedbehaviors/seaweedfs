@@ -1,0 +1,56 @@
+name: Helm chart CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'Chart.yaml'
+      - 'values.yaml'
+      - 'values/**'
+      - 'README.md'
+      - '.helmignore'
+      - 'templates/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'Chart.yaml'
+      - 'values.yaml'
+      - 'values/**'
+      - 'README.md'
+      - '.helmignore'
+      - 'templates/**'
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      baseline_version:
+        description: 'First release version when no tags exist (e.g. 1.0.0)'
+        required: false
+      release_tag:
+        description: 'Release tag override (e.g. seaweedfs-v1.0.0)'
+        required: false
+
+concurrency: helm-chart-seaweedfs
+
+jobs:
+  ci:
+    permissions:
+      contents: write
+      pull-requests: read
+    uses: expectedbehaviors/github-actions/.github/workflows/helm-chart-ci.yml@main
+    secrets: inherit
+    with:
+      chart_path: .
+      tag_prefix: seaweedfs-v
+      helm_repositories: |
+        seaweedfs-operator=https://seaweedfs.github.io/seaweedfs-operator/
+        seaweedfs-csi-driver=https://seaweedfs.github.io/seaweedfs-csi-driver/helm
+      publish_enabled: true
+      release_notes_enabled: false
+      chart_name: seaweedfs
+      helm_repo_name: seaweedfs-operator
+      helm_repo_url: https://seaweedfs.github.io/seaweedfs-operator/
+      helm_repo_name_2: seaweedfs-csi-driver
+      helm_repo_url_2: https://seaweedfs.github.io/seaweedfs-csi-driver/helm
+      initial_version: ${{ github.event.inputs.baseline_version || '' }}
+      release_tag: ${{ github.event.inputs.release_tag || '' }}
