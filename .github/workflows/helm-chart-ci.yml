@@ -46,7 +46,7 @@ jobs:
         seaweedfs-operator=https://seaweedfs.github.io/seaweedfs-operator/
         seaweedfs-csi-driver=https://seaweedfs.github.io/seaweedfs-csi-driver/helm
       publish_enabled: true
-      release_notes_enabled: false
+      release_notes_enabled: true
       chart_name: seaweedfs
       helm_repo_name: seaweedfs-operator
       helm_repo_url: https://seaweedfs.github.io/seaweedfs-operator/
