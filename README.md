@@ -89,7 +89,7 @@ This chart is published to **https://expectedbehaviors.github.io/seaweedfs** via
 
 ## Argo CD
 
-For private instantiations, point Argo CD at the published Helm repo and provide your private values repo as the values source. In this homelab, the values repo is `git@github.com:jd4883/homelab-seaweedfs.git`.
+For private instantiations, point Argo CD at the published Helm repo and provide your private values repo as the values source (for example `git@github.com:your-org/your-seaweedfs-values.git`).
 
 ## Upstream documentation
 
